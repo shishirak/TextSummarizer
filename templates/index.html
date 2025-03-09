@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Summarizer</title>
+
+    <!-- jQuery library for handling AJAX requests -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Styling for the HTML elements -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 30px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      textarea {
+        width: 100%;
+        margin-bottom: 20px;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 2px solid rgb(15, 16, 26);
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      #loading {
+        display: none;
+        color: rgb(79, 76, 175);
+      }
+
+      #summary {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Text Summarizer</h1>
+
+    <!-- Textarea for the user to input text -->
+    <textarea
+      id="article"
+      rows="10"
+      cols="50"
+      placeholder="Enter text to summarize..."
+    ></textarea
+    ><br />
+
+    <!-- Button to trigger text summarization -->
+    <button onclick="summarizeText()">Summarize</button>
+
+    <!-- Button to clear the input text and summary -->
+    <button onclick="clearText()">Clear</button>
+
+    <h2>Summary:</h2>
+
+    <!-- Loading indicator (hidden initially) -->
+    <p id="loading">Loading...</p>
+
+    <!-- Paragraph to display the generated summary -->
+    <p id="summary"></p>
+
+    <script>
+      // Function to send text to the backend for summarization
+      function summarizeText() {
+        var articleText = $("#article").val(); // Get text from textarea
+
+        // Check if the input text is empty
+
+        if (articleText === "") {
+          alert("Please enter a valid paragraph before summarizing."); // Show alert message
+          return; // Stop function execution
+        }
+
+        $("#summary").text(""); // Clear any previous summary
+        $("#loading").show(); // Show loading indicator
+
+        // AJAX request to send text to the backend
+        $.ajax({
+          type: "POST", // HTTP method
+          url: "/summarize", // Backend endpoint
+          data: { article: articleText }, // Data to send (text input)
+          success: function (response) {
+            $("#loading").hide(); // Hide loading text once response is received
+            if (response.summary) {
+              $("#summary").text(response.summary); // Display summary if received
+            } else {
+              $("#summary").text("Error: " + response.error); // Show error message if any
+            }
+          },
+          error: function () {
+            $("#loading").hide(); // Hide loading text in case of error
+            $("#summary").text("An error occurred. Please try again.");
+          },
+        });
+      }
+
+      // Function to clear input text and summary
+      function clearText() {
+        $("#article").val(""); // Clear the text input field
+        $("#summary").text(""); // Clear the displayed summary
+      }
+    </script>
+  </body>
+</html>
